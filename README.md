@@ -1,5 +1,4 @@
 # 🚨 Use at your own risk! 🚨
-## ⚠️ NOTICE: This is a fork of [phpdocumentor/graphviz](https://github.com/phpDocumentor/GraphViz) library, modified for PHP 8.4 compatibility. And changes have been made to exceptions and references to non-existent attributes.
 
 ## ⚠️ Notice: This is a fork of the [phpdocumentor/graphviz](https://github.com/phpDocumentor/GraphViz) library, modified for compatibility with PHP 8.4.**
 - Exceptions have been modified: Now the library throws an error when attempting to access non-existent attributes.
