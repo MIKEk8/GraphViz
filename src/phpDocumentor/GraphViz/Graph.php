@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace phpDocumentor\GraphViz;
 
 use InvalidArgumentException;
+use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
+use phpDocumentor\GraphViz\Exceptions\Exception;
 
 use function array_merge;
 use function escapeshellarg;
@@ -51,32 +53,32 @@ class Graph
     use Attributes;
 
     /** @var string Name of this graph */
-    protected $name = 'G';
+    protected string $name = 'G';
 
     /** @var string Type of this graph; may be digraph, graph or subgraph */
-    protected $type = 'digraph';
+    protected GraphType $type = GraphType::DIGRAPH;
 
     /** @var bool If the graph is strict then multiple edges are not allowed between the same pairs of nodes */
-    protected $strict = false;
+    protected bool $strict = false;
 
     /** @var Graph[] A list of subgraphs for this Graph */
-    protected $graphs = [];
+    protected array $graphs = [];
 
     /** @var Node[] A list of nodes for this Graph */
-    protected $nodes = [];
+    protected array $nodes = [];
 
     /** @var Edge[] A list of edges / arrows for this Graph */
-    protected $edges = [];
+    protected array $edges = [];
 
     /** @var string The path to execute dot from */
-    protected $path = '';
+    protected string $path = '';
 
     /**
      * Factory method to instantiate a Graph so that you can use fluent coding
      * to chain everything.
      *
-     * @param string $name        The name for this graph.
-     * @param bool   $directional Whether this is a directed or undirected graph.
+     * @param string $name The name for this graph.
+     * @param bool $directional Whether this is a directed or undirected graph.
      *
      * @return Graph
      */
@@ -131,24 +133,27 @@ class Graph
     /**
      * Sets the type for this graph.
      *
-     * @param string $type Must be either "digraph", "graph" or "subgraph".
+     * @param string|GraphType $type Must be either "digraph", "graph" or "subgraph".
      *
      * @throws InvalidArgumentException If $type is not "digraph", "graph" or
      * "subgraph".
      */
-    public function setType(string $type): self
+    public function setType(string|GraphType $type): self
     {
-        if (!in_array($type, ['digraph', 'graph', 'subgraph'], true)) {
-            throw new InvalidArgumentException(
-                'The type for a graph must be either "digraph", "graph" or '
-                . '"subgraph"'
-            );
+        if (is_string($type)) {
+            $type = GraphType::tryFrom($type);
+            if ($type === null) {
+                throw new InvalidArgumentException(
+                    'The type must be either "digraph", "graph", or "subgraph".'
+                );
+            }
         }
 
         $this->type = $type;
 
         return $this;
     }
+
 
     /**
      * Returns the type of this Graph.
@@ -184,7 +189,7 @@ class Graph
      * Set methods return this graph (fluent interface) whilst get methods
      * return the attribute value.
      *
-     * @param string  $name      Name of the method including get/set
+     * @param string $name Name of the method including get/set
      * @param mixed[] $arguments The arguments, should be 1: the value
      *
      * @return Attribute|Graph|null
@@ -195,7 +200,7 @@ class Graph
     {
         $key = strtolower(substr($name, 3));
         if (strtolower(substr($name, 0, 3)) === 'set') {
-            return $this->setAttribute($key, (string) $arguments[0]);
+            return $this->setAttribute($key, (string)$arguments[0]);
         }
 
         if (strtolower(substr($name, 0, 3)) === 'get') {
@@ -212,10 +217,10 @@ class Graph
      * Thus if you have 2 subgraphs with the same name that the first will be
      * overwritten by the latter.
      *
-     * @see Graph::create()
-     *
      * @param Graph $graph The graph to add onto this graph as
      * subgraph.
+     * @see Graph::create()
+     *
      */
     public function addGraph(self $graph): self
     {
@@ -251,9 +256,9 @@ class Graph
      * Nodes can be retrieved by retrieving the property with the same name.
      * Thus 'node1' can be retrieved by invoking: $graph->node1
      *
+     * @param Node $node The node to set onto this Graph.
      * @see Node::create()
      *
-     * @param Node $node The node to set onto this Graph.
      */
     public function setNode(Node $node): self
     {
@@ -286,10 +291,10 @@ class Graph
     /**
      * Sets a node using a custom name.
      *
+     * @param string $name Name of the node.
+     * @param Node $value Node to set on the given name.
      * @see Graph::setNode()
      *
-     * @param string $name  Name of the node.
-     * @param Node   $value Node to set on the given name.
      */
     public function __set(string $name, Node $value): void
     {
@@ -299,9 +304,9 @@ class Graph
     /**
      * Returns the requested node by its name.
      *
+     * @param string $name The name of the node to retrieve.
      * @see Graph::setNode()
      *
-     * @param string $name The name of the node to retrieve.
      */
     public function __get(string $name): ?Node
     {
@@ -311,9 +316,9 @@ class Graph
     /**
      * Links two nodes to eachother and registers the Edge onto this graph.
      *
+     * @param Edge $edge The link between two classes.
      * @see Edge::create()
      *
-     * @param Edge $edge The link between two classes.
      */
     public function link(Edge $edge): self
     {
@@ -330,7 +335,7 @@ class Graph
      * @link http://www.graphviz.org/content/output-formats
      * @uses GraphViz/dot
      *
-     * @param string $type     The type to export to; see the link above for a
+     * @param string $type The type to export to; see the link above for a
      *     list of supported types.
      * @param string $filename The path to write to.
      *
@@ -338,19 +343,19 @@ class Graph
      */
     public function export(string $type, string $filename): self
     {
-        $type     = escapeshellarg($type);
+        $type = escapeshellarg($type);
         $filename = escapeshellarg($filename);
 
         // write the dot file to a temporary file
-        $tmpfile = (string) tempnam(sys_get_temp_dir(), 'gvz');
-        file_put_contents($tmpfile, (string) $this);
+        $tmpfile = (string)tempnam(sys_get_temp_dir(), 'gvz');
+        file_put_contents($tmpfile, (string)$this);
 
         // escape the temp file for use as argument
         $tmpfileArg = escapeshellarg($tmpfile);
 
         // create the dot output
         $output = [];
-        $code   = 0;
+        $code = 0;
         exec($this->path . "dot -T${type} -o${filename} < ${tmpfileArg} 2>&1", $output, $code);
         unlink($tmpfile);
 
@@ -381,7 +386,7 @@ class Graph
 
         $attributes = [];
         foreach ($elements as $value) {
-            $attributes[] = (string) $value;
+            $attributes[] = (string)$value;
         }
 
         $attributes = implode(PHP_EOL, $attributes);

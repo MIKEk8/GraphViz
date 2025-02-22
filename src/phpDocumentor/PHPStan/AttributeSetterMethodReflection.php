@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace phpDocumentor\GraphViz\PHPStan;
 
-use phpDocumentor\GraphViz\AttributeNotFound;
+use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
 use PHPStan\Reflection\ClassMemberReflection;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\FunctionVariant;
@@ -27,13 +27,9 @@ use PHPStan\Type\Type;
 
 final class AttributeSetterMethodReflection implements MethodReflection
 {
-    /** @var ClassReflection */
-    private $classReflection;
-
-    /** @var string */
-    private $name;
-    /** @var Type */
-    private $attributeType;
+    private ClassReflection $classReflection;
+    private string $name;
+    private Type $attributeType;
 
     public function __construct(ClassReflection $classReflection, string $name, Type $attributeType)
     {

@@ -1,5 +1,5 @@
 includes:
-    - /composer/vendor/phpstan/phpstan-mockery/extension.neon
+    - ./vendor/phpstan/phpstan-mockery/extension.neon
     - ./extension.neon
 
 parameters:

@@ -17,12 +17,12 @@ use phpDocumentor\GraphViz\Attribute;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Test for the the class representing a GraphViz attribute.
+ * Test for the class representing a GraphViz attribute.
  */
 class AttributeTest extends TestCase
 {
     /** @var Attribute */
-    protected $fixture = null;
+    protected ?Attribute $fixture = null;
 
     /**
      * Initializes the fixture for this test.

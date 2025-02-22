@@ -15,9 +15,9 @@ namespace phpDocumentor\GraphViz\Test;
 
 use InvalidArgumentException;
 use Mockery as m;
-use phpDocumentor\GraphViz\AttributeNotFound;
 use phpDocumentor\GraphViz\Edge;
-use phpDocumentor\GraphViz\Exception;
+use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
+use phpDocumentor\GraphViz\Exceptions\Exception;
 use phpDocumentor\GraphViz\Graph;
 use phpDocumentor\GraphViz\Node;
 use PHPUnit\Framework\TestCase;
@@ -36,7 +36,7 @@ use const PHP_EOL;
 class GraphTest extends TestCase
 {
     /** @var Graph */
-    protected $fixture;
+    protected Graph $fixture;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -213,7 +213,7 @@ class GraphTest extends TestCase
 
     /**
      * @covers \phpDocumentor\GraphViz\Graph::getAttribute
-     * @covers \phpDocumentor\GraphViz\AttributeNotFound::__construct
+     * @covers \phpDocumentor\GraphViz\Exceptions\AttributeNotFound::__construct
      */
     public function testGetNonExistingAttributeThrowsAttributeNotFound(): void
     {

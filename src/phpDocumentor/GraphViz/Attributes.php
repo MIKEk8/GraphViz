@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace phpDocumentor\GraphViz;
 
+use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
+
 use function array_key_exists;
 
 trait Attributes
 {
     /** @var Attribute[] */
-    protected $attributes = [];
+    protected array $attributes = [];
 
     public function setAttribute(string $name, string $value): self
     {

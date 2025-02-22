@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace phpDocumentor\GraphViz\Test;
 
 use Mockery as m;
-use phpDocumentor\GraphViz\AttributeNotFound;
 use phpDocumentor\GraphViz\Edge;
+use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
 use phpDocumentor\GraphViz\Node;
 use PHPUnit\Framework\TestCase;
 
@@ -117,7 +117,7 @@ class EdgeTest extends TestCase
 
     /**
      * @covers \phpDocumentor\GraphViz\Edge::getAttribute
-     * @covers \phpDocumentor\GraphViz\AttributeNotFound::__construct
+     * @covers \phpDocumentor\GraphViz\Exceptions\AttributeNotFound::__construct
      */
     public function testGetNonExistingAttributeThrowsAttributeNotFound(): void
     {

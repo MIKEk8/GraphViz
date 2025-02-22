@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace phpDocumentor\GraphViz\PHPStan;
 
 use phpDocumentor\GraphViz\Attribute;
-use phpDocumentor\GraphViz\AttributeNotFound;
+use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
 use PHPStan\Reflection\ClassMemberReflection;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\FunctionVariant;
@@ -28,10 +28,10 @@ use PHPStan\Type\Type;
 final class AttributeGetterMethodReflection implements MethodReflection
 {
     /** @var ClassReflection */
-    private $classReflection;
+    private ClassReflection $classReflection;
 
     /** @var string */
-    private $name;
+    private string $name;
 
     public function __construct(ClassReflection $classReflection, string $name)
     {

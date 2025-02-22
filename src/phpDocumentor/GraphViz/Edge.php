@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace phpDocumentor\GraphViz;
 
+use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
+
 use function addslashes;
 use function implode;
 use function strtolower;
@@ -28,22 +30,22 @@ class Edge
     use Attributes;
 
     /** @var Node Node from where to link */
-    private $from;
+    private Node $from;
 
-    /** @var Node Node where to to link */
-    private $to;
+    /** @var Node Node where to link */
+    private Node $to;
 
     /**
      * Creates a new Edge / Link between the given nodes.
      *
      * @param Node $from Starting node to create an Edge from.
-     * @param Node $to   Destination node where to create and
+     * @param Node $to Destination node where to create and
      *  edge to.
      */
     public function __construct(Node $from, Node $to)
     {
         $this->from = $from;
-        $this->to   = $to;
+        $this->to = $to;
     }
 
     /**
@@ -52,7 +54,7 @@ class Edge
      * See the examples for more details.
      *
      * @param Node $from Starting node to create an Edge from.
-     * @param Node $to   Destination node where to create and
+     * @param Node $to Destination node where to create and
      *   edge to.
      */
     public static function create(Node $from, Node $to): self
@@ -86,7 +88,7 @@ class Edge
      * Set methods return this graph (fluent interface) whilst get methods
      * return the attribute value.
      *
-     * @param string  $name      name of the invoked method, expect it to be
+     * @param string $name name of the invoked method, expect it to be
      *       setX or getX.
      * @param mixed[] $arguments Arguments for the setter, only 1 is expected: value
      *
@@ -98,7 +100,7 @@ class Edge
     {
         $key = strtolower(substr($name, 3));
         if (strtolower(substr($name, 0, 3)) === 'set') {
-            return $this->setAttribute($key, (string) $arguments[0]);
+            return $this->setAttribute($key, (string)$arguments[0]);
         }
 
         if (strtolower(substr($name, 0, 3)) === 'get') {
@@ -115,17 +117,17 @@ class Edge
     {
         $attributes = [];
         foreach ($this->attributes as $value) {
-            $attributes[] = (string) $value;
+            $attributes[] = (string)$value;
         }
 
         $attributes = implode("\n", $attributes);
 
         $fromName = addslashes($this->getFrom()->getName());
-        $toName   = addslashes($this->getTo()->getName());
+        $toName = addslashes($this->getTo()->getName());
 
         return <<<DOT
-"${fromName}" -> "${toName}" [
-${attributes}
+"{$fromName}" -> "{$toName}" [
+{$attributes}
 ]
 DOT;
     }

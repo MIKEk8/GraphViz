@@ -33,6 +33,7 @@ final class GraphNodeReflectionExtension implements PropertiesClassReflectionExt
         return new AnnotationPropertyReflection(
             $classReflection,
             new ObjectType(Node::class),
+            new ObjectType(Node::class),
             true,
             true
         );

@@ -25,20 +25,20 @@ use function strstr;
 class Attribute
 {
     /** @var string The name of this attribute */
-    protected $key = '';
+    protected string $key = '';
 
     /** @var string The value of this attribute */
-    protected $value = '';
+    protected string $value = '';
 
     /**
      * Creating a new attribute.
      *
-     * @param string $key   Id for the new attribute.
+     * @param string $key Id for the new attribute.
      * @param string $value Value for this attribute,
      */
     public function __construct(string $key, string $value)
     {
-        $this->key   = $key;
+        $this->key = $key;
         $this->value = $value;
     }
 
@@ -113,7 +113,7 @@ class Attribute
     }
 
     /**
-     * Checks whether the value contains any any special characters needing escaping.
+     * Checks whether the value contains any special characters needing escaping.
      */
     public function isValueContainingSpecials(): bool
     {
@@ -130,6 +130,6 @@ class Attribute
         $value = $this->getValue();
         $regex = '(\'|"|\\x00|\\\\(?![\\\\NGETHLnlr]))';
 
-        return (string) preg_replace($regex, '\\\\$0', $value);
+        return (string)preg_replace($regex, '\\\\$0', $value);
     }
 }

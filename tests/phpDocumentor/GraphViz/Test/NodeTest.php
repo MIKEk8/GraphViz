@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace phpDocumentor\GraphViz\Test;
 
-use phpDocumentor\GraphViz\AttributeNotFound;
+use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
 use phpDocumentor\GraphViz\Node;
 use PHPUnit\Framework\TestCase;
 
@@ -108,7 +108,7 @@ class NodeTest extends TestCase
 
     /**
      * @covers \phpDocumentor\GraphViz\Node::getAttribute
-     * @covers \phpDocumentor\GraphViz\AttributeNotFound::__construct
+     * @covers \phpDocumentor\GraphViz\Exceptions\AttributeNotFound::__construct
      */
     public function testGetNonExistingAttributeThrowsAttributeNotFound(): void
     {

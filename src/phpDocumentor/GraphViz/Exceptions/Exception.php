@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @link      http://phpdoc.org
  */
 
-namespace phpDocumentor\GraphViz;
+namespace phpDocumentor\GraphViz\Exceptions;
 
 /**
  * Class representing an exception in this GraphViz component.

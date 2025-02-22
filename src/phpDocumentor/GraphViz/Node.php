@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace phpDocumentor\GraphViz;
 
+use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
+
 use function addslashes;
 use function implode;
 use function strtolower;
@@ -30,12 +32,12 @@ class Node
     use Attributes;
 
     /** @var string Name for this node */
-    protected $name = '';
+    protected string $name = '';
 
     /**
      * Creates a new node with name and optional label.
      *
-     * @param string      $name  Name of the new node.
+     * @param string $name Name of the new node.
      * @param string|null $label Optional label text.
      */
     public function __construct(string $name, ?string $label = null)
@@ -53,7 +55,7 @@ class Node
      *
      * See the examples for more details.
      *
-     * @param string      $name  Name of the new node.
+     * @param string $name Name of the new node.
      * @param string|null $label Optional label text.
      */
     public static function create(string $name, ?string $label = null): self
@@ -93,7 +95,7 @@ class Node
      * Set methods return this graph (fluent interface) whilst get methods
      * return the attribute value.
      *
-     * @param string  $name      Method name; either getX or setX is expected.
+     * @param string $name Method name; either getX or setX is expected.
      * @param mixed[] $arguments List of arguments; only 1 is expected for setX.
      *
      * @return Attribute|Node|null
@@ -104,7 +106,7 @@ class Node
     {
         $key = strtolower(substr($name, 3));
         if (strtolower(substr($name, 0, 3)) === 'set') {
-            return $this->setAttribute($key, (string) $arguments[0]);
+            return $this->setAttribute($key, (string)$arguments[0]);
         }
 
         if (strtolower(substr($name, 0, 3)) === 'get') {
@@ -121,7 +123,7 @@ class Node
     {
         $attributes = [];
         foreach ($this->attributes as $value) {
-            $attributes[] = (string) $value;
+            $attributes[] = (string)$value;
         }
 
         $attributes = implode("\n", $attributes);
@@ -130,7 +132,7 @@ class Node
 
         return <<<DOT
 "{$name}" [
-${attributes}
+{$attributes}
 ]
 DOT;
     }

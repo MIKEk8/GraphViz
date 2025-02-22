@@ -40,7 +40,7 @@ use function substr;
 
 final class MethodReflectionExtension implements MethodsClassReflectionExtension
 {
-    private const SUPPORTED_CLASSES = [
+    private const array SUPPORTED_CLASSES = [
         Node::class => 'node',
         Graph::class => 'graph',
         Edge::class => 'edge',
@@ -107,17 +107,11 @@ final class MethodReflectionExtension implements MethodsClassReflectionExtension
 
         $type = $attributes[0]['type'];
         $type = str_replace('xsd:', '', (string) $type);
-        switch ($type) {
-            case 'boolean':
-                return new BooleanType();
-
-            case 'decimal':
-                return new FloatType();
-
-            case 'string':
-            default:
-                return new StringType();
-        }
+        return match ($type) {
+            'boolean' => new BooleanType(),
+            'decimal' => new FloatType(),
+            default => new StringType(),
+        };
     }
 
     private function getAttributesXmlDoc(): SimpleXMLElement
