@@ -13,34 +13,23 @@ declare(strict_types=1);
 
 namespace phpDocumentor\GraphViz;
 
-use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
-
-use function addslashes;
-use function implode;
-use function strtolower;
-use function substr;
+use phpDocumentor\GraphViz\Traits\AttributeSetterAndGetter;
 
 /**
- * Class representing an edge (arrow, line).
- *
- * @link      http://phpdoc.org
+ * Represents an edge (connection) between two nodes in a GraphViz graph.
  */
 class Edge
 {
-    use Attributes;
+    use AttributeSetterAndGetter;
 
-    /** @var Node Node from where to link */
     private Node $from;
-
-    /** @var Node Node where to link */
     private Node $to;
 
     /**
-     * Creates a new Edge / Link between the given nodes.
+     * Creates a new edge between two nodes.
      *
-     * @param Node $from Starting node to create an Edge from.
-     * @param Node $to Destination node where to create and
-     *  edge to.
+     * @param Node $from Source node.
+     * @param Node $to   Destination node.
      */
     public function __construct(Node $from, Node $to)
     {
@@ -49,13 +38,10 @@ class Edge
     }
 
     /**
-     * Factory method used to assist with fluent interface handling.
+     * Factory method for fluent interface.
      *
-     * See the examples for more details.
-     *
-     * @param Node $from Starting node to create an Edge from.
-     * @param Node $to Destination node where to create and
-     *   edge to.
+     * @param Node $from Source node.
+     * @param Node $to   Destination node.
      */
     public static function create(Node $from, Node $to): self
     {
@@ -63,7 +49,7 @@ class Edge
     }
 
     /**
-     * Returns the source Node for this Edge.
+     * Gets the source node.
      */
     public function getFrom(): Node
     {
@@ -71,7 +57,7 @@ class Edge
     }
 
     /**
-     * Returns the destination Node for this Edge.
+     * Gets the destination node.
      */
     public function getTo(): Node
     {
@@ -79,56 +65,14 @@ class Edge
     }
 
     /**
-     * Magic method to provide a getter/setter to add attributes on the edge.
-     *
-     * Using this method we make sure that we support any attribute without too
-     * much hassle. If the name for this method does not start with get or set
-     * we return null.
-     *
-     * Set methods return this graph (fluent interface) whilst get methods
-     * return the attribute value.
-     *
-     * @param string $name name of the invoked method, expect it to be
-     *       setX or getX.
-     * @param mixed[] $arguments Arguments for the setter, only 1 is expected: value
-     *
-     * @return Attribute|Edge|null
-     *
-     * @throws AttributeNotFound
-     */
-    public function __call(string $name, array $arguments)
-    {
-        $key = strtolower(substr($name, 3));
-        if (strtolower(substr($name, 0, 3)) === 'set') {
-            return $this->setAttribute($key, (string)$arguments[0]);
-        }
-
-        if (strtolower(substr($name, 0, 3)) === 'get') {
-            return $this->getAttribute($key);
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the edge definition as is requested by GraphViz.
+     * Converts the edge definition to a GraphViz-compatible string.
      */
     public function __toString(): string
     {
-        $attributes = [];
-        foreach ($this->attributes as $value) {
-            $attributes[] = (string)$value;
-        }
+        $attributes = implode(", ", array_map('strval', $this->attributes));
+        $fromName = addslashes($this->from->getName());
+        $toName = addslashes($this->to->getName());
 
-        $attributes = implode("\n", $attributes);
-
-        $fromName = addslashes($this->getFrom()->getName());
-        $toName = addslashes($this->getTo()->getName());
-
-        return <<<DOT
-"{$fromName}" -> "{$toName}" [
-{$attributes}
-]
-DOT;
+        return "\"{$fromName}\" -> \"{$toName}\" [{$attributes}]";
     }
 }

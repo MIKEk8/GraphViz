@@ -14,27 +14,11 @@ declare(strict_types=1);
 namespace phpDocumentor\GraphViz;
 
 use InvalidArgumentException;
-use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
 use phpDocumentor\GraphViz\Exceptions\Exception;
-
-use function array_merge;
-use function escapeshellarg;
-use function exec;
-use function file_put_contents;
-use function implode;
-use function in_array;
-use function realpath;
-use function strtolower;
-use function substr;
-use function sys_get_temp_dir;
-use function tempnam;
-use function unlink;
-
-use const DIRECTORY_SEPARATOR;
-use const PHP_EOL;
+use phpDocumentor\GraphViz\Traits\AttributeSetterAndGetter;
 
 /**
- * Class representing a graph; this may be a main graph but also a subgraph.
+ * Represents a GraphViz graph (main graph or subgraph).
  *
  * In case of a subgraph:
  * When the name of the subgraph is prefixed with _cluster_ then the contents
@@ -50,12 +34,12 @@ use const PHP_EOL;
  */
 class Graph
 {
-    use Attributes;
+    use AttributeSetterAndGetter;
 
     /** @var string Name of this graph */
     protected string $name = 'G';
 
-    /** @var string Type of this graph; may be digraph, graph or subgraph */
+    /** @var GraphType Type of this graph; may be digraph, graph or subgraph */
     protected GraphType $type = GraphType::DIGRAPH;
 
     /** @var bool If the graph is strict then multiple edges are not allowed between the same pairs of nodes */
@@ -85,9 +69,8 @@ class Graph
     public static function create(string $name = 'G', bool $directional = true): self
     {
         $graph = new self();
-        $graph
-            ->setName($name)
-            ->setType($directional ? 'digraph' : 'graph');
+        $graph->setName($name)
+            ->setType($directional ? GraphType::DIGRAPH : GraphType::GRAPH);
 
         return $graph;
     }
@@ -100,8 +83,8 @@ class Graph
     public function setPath(string $path): self
     {
         $realpath = realpath($path);
-        if ($path && $path === $realpath) {
-            $this->path = $path . DIRECTORY_SEPARATOR;
+        if ($realpath) {
+            $this->path = $realpath . DIRECTORY_SEPARATOR;
         }
 
         return $this;
@@ -143,9 +126,7 @@ class Graph
         if (is_string($type)) {
             $type = GraphType::tryFrom($type);
             if ($type === null) {
-                throw new InvalidArgumentException(
-                    'The type must be either "digraph", "graph", or "subgraph".'
-                );
+                throw new InvalidArgumentException('Type must be "digraph", "graph", or "subgraph".');
             }
         }
 
@@ -160,7 +141,7 @@ class Graph
      */
     public function getType(): string
     {
-        return $this->type;
+        return $this->type->value;
     }
 
     /**
@@ -180,37 +161,6 @@ class Graph
     }
 
     /**
-     * Magic method to provide a getter/setter to add attributes on the Graph.
-     *
-     * Using this method we make sure that we support any attribute without
-     * too much hassle. If the name for this method does not start with get
-     * or set we return null.
-     *
-     * Set methods return this graph (fluent interface) whilst get methods
-     * return the attribute value.
-     *
-     * @param string $name Name of the method including get/set
-     * @param mixed[] $arguments The arguments, should be 1: the value
-     *
-     * @return Attribute|Graph|null
-     *
-     * @throws AttributeNotFound
-     */
-    public function __call(string $name, array $arguments)
-    {
-        $key = strtolower(substr($name, 3));
-        if (strtolower(substr($name, 0, 3)) === 'set') {
-            return $this->setAttribute($key, (string)$arguments[0]);
-        }
-
-        if (strtolower(substr($name, 0, 3)) === 'get') {
-            return $this->getAttribute($key);
-        }
-
-        return null;
-    }
-
-    /**
      * Adds a subgraph to this graph; automatically changes the type to subgraph.
      *
      * Please note that an index is maintained using the name of the subgraph.
@@ -224,7 +174,7 @@ class Graph
      */
     public function addGraph(self $graph): self
     {
-        $graph->setType('subgraph');
+        $graph->setType(GraphType::SUBGRAPH);
         $this->graphs[$graph->getName()] = $graph;
 
         return $this;
@@ -343,27 +293,16 @@ class Graph
      */
     public function export(string $type, string $filename): self
     {
-        $type = escapeshellarg($type);
-        $filename = escapeshellarg($filename);
-
-        // write the dot file to a temporary file
         $tmpfile = (string)tempnam(sys_get_temp_dir(), 'gvz');
         file_put_contents($tmpfile, (string)$this);
 
-        // escape the temp file for use as argument
-        $tmpfileArg = escapeshellarg($tmpfile);
-
-        // create the dot output
         $output = [];
         $code = 0;
-        exec($this->path . "dot -T${type} -o${filename} < ${tmpfileArg} 2>&1", $output, $code);
+        exec($this->path . "dot -T" . escapeshellarg($type) . " -o" . escapeshellarg($filename) . " " . escapeshellarg($tmpfile) . " 2>&1", $output, $code);
         unlink($tmpfile);
 
         if ($code !== 0) {
-            throw new Exception(
-                'An error occurred while creating the graph; GraphViz returned: '
-                . implode(PHP_EOL, $output)
-            );
+            throw new Exception('GraphViz error: ' . implode(PHP_EOL, $output));
         }
 
         return $this;
@@ -377,26 +316,11 @@ class Graph
      */
     public function __toString(): string
     {
-        $elements = array_merge(
-            $this->graphs,
-            $this->attributes,
-            $this->edges,
-            $this->nodes
-        );
+        $elements = array_merge($this->graphs, $this->attributes, $this->edges, $this->nodes);
+        $content = implode(PHP_EOL, array_map('strval', $elements));
 
-        $attributes = [];
-        foreach ($elements as $value) {
-            $attributes[] = (string)$value;
-        }
+        $strict = $this->strict ? 'strict ' : '';
 
-        $attributes = implode(PHP_EOL, $attributes);
-
-        $strict = ($this->isStrict() ? 'strict ' : '');
-
-        return <<<DOT
-{$strict}{$this->getType()} "{$this->getName()}" {
-${attributes}
-}
-DOT;
+        return "{$strict}{$this->getType()} \"{$this->getName()}\" {\n{$content}\n}";
     }
 }

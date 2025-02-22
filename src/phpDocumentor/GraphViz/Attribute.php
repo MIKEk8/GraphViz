@@ -2,39 +2,21 @@
 
 declare(strict_types=1);
 
-/**
- * phpDocumentor
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- *
- * @link      http://phpdoc.org
- */
-
 namespace phpDocumentor\GraphViz;
 
-use function addslashes;
-use function preg_replace;
-use function strstr;
-
 /**
- * Class representing a single GraphViz attribute.
- *
- * @link      http://phpdoc.org
+ * Represents a single GraphViz attribute.
  */
 class Attribute
 {
-    /** @var string The name of this attribute */
-    protected string $key = '';
-
-    /** @var string The value of this attribute */
-    protected string $value = '';
+    protected string $key;
+    protected string $value;
 
     /**
-     * Creating a new attribute.
+     * Creates a new attribute.
      *
-     * @param string $key Id for the new attribute.
-     * @param string $value Value for this attribute,
+     * @param string $key   Attribute name.
+     * @param string $value Attribute value.
      */
     public function __construct(string $key, string $value)
     {
@@ -43,9 +25,9 @@ class Attribute
     }
 
     /**
-     * Sets the key for this attribute.
+     * Sets the attribute key.
      *
-     * @param string $key The new name of this attribute.
+     * @param string $key Attribute name.
      */
     public function setKey(string $key): self
     {
@@ -55,7 +37,7 @@ class Attribute
     }
 
     /**
-     * Returns the name for this attribute.
+     * Gets the attribute key.
      */
     public function getKey(): string
     {
@@ -63,9 +45,9 @@ class Attribute
     }
 
     /**
-     * Sets the value for this attribute.
+     * Sets the attribute value.
      *
-     * @param string $value The new value.
+     * @param string $value Attribute value.
      */
     public function setValue(string $value): self
     {
@@ -75,7 +57,7 @@ class Attribute
     }
 
     /**
-     * Returns the value for this attribute.
+     * Gets the attribute value.
      */
     public function getValue(): string
     {
@@ -83,53 +65,45 @@ class Attribute
     }
 
     /**
-     * Returns the attribute definition as is requested by GraphViz.
+     * Converts the attribute to a GraphViz-compatible string.
      */
     public function __toString(): string
     {
-        $key = $this->getKey();
-        if ($key === 'url') {
-            $key = 'URL';
-        }
+        $key = $this->key === 'url' ? 'URL' : $this->key;
+        $value = $this->value;
 
-        $value = $this->getValue();
         if ($this->isValueContainingSpecials()) {
             $value = '"' . $this->encodeSpecials() . '"';
         } elseif (!$this->isValueInHtml()) {
             $value = '"' . addslashes($value) . '"';
         }
 
-        return $key . '=' . $value;
+        return "{$key}={$value}";
     }
 
     /**
-     * Returns whether the value contains HTML.
+     * Checks if the value contains HTML.
      */
     public function isValueInHtml(): bool
     {
-        $value = $this->getValue();
-
-        return isset($value[0]) && ($value[0] === '<');
+        return str_starts_with($this->value, '<');
     }
 
     /**
-     * Checks whether the value contains any special characters needing escaping.
+     * Checks if the value contains special characters needing escaping.
      */
     public function isValueContainingSpecials(): bool
     {
-        return strstr($this->getValue(), '\\') !== false;
+        return str_contains($this->value, '\\');
     }
 
     /**
-     * Encode special characters so the escape sequences aren't removed
+     * Encodes special characters in the value.
      *
      * @see http://www.graphviz.org/doc/info/attrs.html#k:escString
      */
     protected function encodeSpecials(): string
     {
-        $value = $this->getValue();
-        $regex = '(\'|"|\\x00|\\\\(?![\\\\NGETHLnlr]))';
-
-        return (string)preg_replace($regex, '\\\\$0', $value);
+        return preg_replace('/(\'|"|\\x00|\\\\(?![\\\\NGETHLnlr]))/', '\\\\$0', $this->value);
     }
 }

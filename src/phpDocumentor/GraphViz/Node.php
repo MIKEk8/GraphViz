@@ -13,50 +13,37 @@ declare(strict_types=1);
 
 namespace phpDocumentor\GraphViz;
 
-use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
-
-use function addslashes;
-use function implode;
-use function strtolower;
-use function substr;
+use phpDocumentor\GraphViz\Traits\AttributeSetterAndGetter;
 
 /**
- * Class representing a node / element in a graph.
- *
- * @link      http://phpdoc.org
- *
- * @method void setLabel(string $name) Sets the label for this node.
+ * Represents a node/element in a GraphViz graph.
  */
 class Node
 {
-    use Attributes;
+    use AttributeSetterAndGetter;
 
-    /** @var string Name for this node */
-    protected string $name = '';
+    protected string $name;
 
     /**
-     * Creates a new node with name and optional label.
+     * Creates a new Node with a given name and optional label.
      *
-     * @param string $name Name of the new node.
-     * @param string|null $label Optional label text.
+     * @param string $name  Name of the node.
+     * @param string|null $label Optional label for the node.
      */
     public function __construct(string $name, ?string $label = null)
     {
-        $this->setName($name);
-        if ($label === null) {
-            return;
-        }
+        $this->name = $name;
 
-        $this->setLabel($label);
+        if ($label !== null) {
+            $this->setLabel($label);
+        }
     }
 
     /**
-     * Factory method used to assist with fluent interface handling.
+     * Static factory method for fluent interface.
      *
-     * See the examples for more details.
-     *
-     * @param string $name Name of the new node.
-     * @param string|null $label Optional label text.
+     * @param string $name  Name of the node.
+     * @param string|null $label Optional label for the node.
      */
     public static function create(string $name, ?string $label = null): self
     {
@@ -64,11 +51,9 @@ class Node
     }
 
     /**
-     * Sets the name for this node.
+     * Sets the node's name.
      *
-     * Not to confuse with the label.
-     *
-     * @param string $name Name for this node.
+     * @param string $name Name of the node.
      */
     public function setName(string $name): self
     {
@@ -78,7 +63,7 @@ class Node
     }
 
     /**
-     * Returns the name for this node.
+     * Gets the node's name.
      */
     public function getName(): string
     {
@@ -86,54 +71,13 @@ class Node
     }
 
     /**
-     * Magic method to provide a getter/setter to add attributes on the Node.
-     *
-     * Using this method we make sure that we support any attribute without
-     * too much hassle. If the name for this method does not start with get or
-     * set we return null.
-     *
-     * Set methods return this graph (fluent interface) whilst get methods
-     * return the attribute value.
-     *
-     * @param string $name Method name; either getX or setX is expected.
-     * @param mixed[] $arguments List of arguments; only 1 is expected for setX.
-     *
-     * @return Attribute|Node|null
-     *
-     * @throws AttributeNotFound
-     */
-    public function __call(string $name, array $arguments)
-    {
-        $key = strtolower(substr($name, 3));
-        if (strtolower(substr($name, 0, 3)) === 'set') {
-            return $this->setAttribute($key, (string)$arguments[0]);
-        }
-
-        if (strtolower(substr($name, 0, 3)) === 'get') {
-            return $this->getAttribute($key);
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the node definition as is requested by GraphViz.
+     * Converts the node definition to a GraphViz-compatible string.
      */
     public function __toString(): string
     {
-        $attributes = [];
-        foreach ($this->attributes as $value) {
-            $attributes[] = (string)$value;
-        }
+        $attributes = implode(PHP_EOL, array_map('strval', $this->attributes));
+        $name = addslashes($this->name);
 
-        $attributes = implode("\n", $attributes);
-
-        $name = addslashes($this->getName());
-
-        return <<<DOT
-"{$name}" [
-{$attributes}
-]
-DOT;
+        return "\"{$name}\" [{$attributes}]";
     }
 }
