@@ -44,7 +44,7 @@ trait Attributes
     public function getAttribute(string $name): Attribute
     {
         if (!isset($this->attributes[$name])) {
-            throw new AttributeNotFound("Attribute '{$name}' not found.");
+            throw new AttributeNotFound($name);
         }
 
         return $this->attributes[$name];

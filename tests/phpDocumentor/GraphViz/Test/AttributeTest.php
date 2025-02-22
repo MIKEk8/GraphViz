@@ -14,15 +14,17 @@ declare(strict_types=1);
 namespace phpDocumentor\GraphViz\Test;
 
 use phpDocumentor\GraphViz\Attribute;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Test for the class representing a GraphViz attribute.
  */
+#[CoversClass(Attribute::class)]
 class AttributeTest extends TestCase
 {
     /** @var Attribute */
-    protected ?Attribute $fixture = null;
+    protected Attribute $fixture;
 
     /**
      * Initializes the fixture for this test.
@@ -35,7 +37,6 @@ class AttributeTest extends TestCase
     /**
      * Tests the construct method
      *
-     * @covers \phpDocumentor\GraphViz\Attribute::__construct
      * @returnn void
      */
     public function testConstruct(): void
@@ -52,9 +53,8 @@ class AttributeTest extends TestCase
     /**
      * Tests the getting and setting of the key.
      *
-     * @covers \phpDocumentor\GraphViz\Attribute::getKey
-     * @covers \phpDocumentor\GraphViz\Attribute::setKey
      */
+
     public function testKey(): void
     {
         $this->assertSame(
@@ -76,9 +76,6 @@ class AttributeTest extends TestCase
 
     /**
      * Tests the getting and setting of the value.
-     *
-     * @covers \phpDocumentor\GraphViz\Attribute::getValue
-     * @covers \phpDocumentor\GraphViz\Attribute::setValue
      */
     public function testValue(): void
     {
@@ -102,7 +99,6 @@ class AttributeTest extends TestCase
     /**
      * Tests whether a string starting with a < is recognized as HTML.
      *
-     * @covers \phpDocumentor\GraphViz\Attribute::isValueInHtml
      */
     public function testIsValueInHtml(): void
     {
@@ -121,8 +117,6 @@ class AttributeTest extends TestCase
 
     /**
      * Tests whether the toString provides a valid GraphViz attribute string.
-     *
-     * @covers \phpDocumentor\GraphViz\Attribute::__toString
      */
     public function testToString(): void
     {
@@ -157,9 +151,6 @@ class AttributeTest extends TestCase
 
     /**
      * Tests whether the toString provides a valid GraphViz attribute string.
-     *
-     * @covers \phpDocumentor\GraphViz\Attribute::__toString
-     * @covers \phpDocumentor\GraphViz\Attribute::encodeSpecials
      */
     public function testToStringWithSpecials(): void
     {
@@ -187,8 +178,6 @@ class AttributeTest extends TestCase
 
     /**
      * Tests whether the isValueContainingSpecials function
-     *
-     * @covers \phpDocumentor\GraphViz\Attribute::isValueContainingSpecials
      */
     public function testIsValueContainingSpecials(): void
     {

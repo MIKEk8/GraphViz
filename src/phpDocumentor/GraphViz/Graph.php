@@ -15,7 +15,7 @@ namespace phpDocumentor\GraphViz;
 
 use InvalidArgumentException;
 use phpDocumentor\GraphViz\Exceptions\Exception;
-use phpDocumentor\GraphViz\Traits\AttributeSetterAndGetter;
+use phpDocumentor\GraphViz\Traits\AttributesSettersAndGetters;
 
 /**
  * Represents a GraphViz graph (main graph or subgraph).
@@ -34,7 +34,7 @@ use phpDocumentor\GraphViz\Traits\AttributeSetterAndGetter;
  */
 class Graph
 {
-    use AttributeSetterAndGetter;
+    use AttributesSettersAndGetters;
 
     /** @var string Name of this graph */
     protected string $name = 'G';

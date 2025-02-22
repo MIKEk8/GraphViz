@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace phpDocumentor\GraphViz;
 
-use phpDocumentor\GraphViz\Traits\AttributeSetterAndGetter;
+use phpDocumentor\GraphViz\Traits\AttributesSettersAndGetters;
 
 /**
  * Represents an edge (connection) between two nodes in a GraphViz graph.
  */
 class Edge
 {
-    use AttributeSetterAndGetter;
+    use AttributesSettersAndGetters;
 
     private Node $from;
     private Node $to;

@@ -17,11 +17,15 @@ use Mockery as m;
 use phpDocumentor\GraphViz\Edge;
 use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
 use phpDocumentor\GraphViz\Node;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Test for the the class representing a GraphViz edge (vertex).
+ * Test for the class representing a GraphViz edge (vertex).
  */
+#[CoversClass(Edge::class)]
+#[CoversMethod(AttributeNotFound::class, '__construct')]
 class EdgeTest extends TestCase
 {
     /**
@@ -35,8 +39,6 @@ class EdgeTest extends TestCase
 
     /**
      * Tests the construct method
-     *
-     * @covers \phpDocumentor\GraphViz\Edge::__construct
      */
     public function testConstruct(): void
     {
@@ -60,8 +62,6 @@ class EdgeTest extends TestCase
 
     /**
      * Tests the create method
-     *
-     * @covers \phpDocumentor\GraphViz\Edge::create
      */
     public function testCreate(): void
     {
@@ -74,8 +74,6 @@ class EdgeTest extends TestCase
     /**
      * Tests whether the getFrom method returns the same node as passed
      * in the create method
-     *
-     * @covers \phpDocumentor\GraphViz\Edge::getFrom
      */
     public function testGetFrom(): void
     {
@@ -87,8 +85,6 @@ class EdgeTest extends TestCase
     /**
      * Tests the getTo method returns the same node as passed
      * in the create method
-     *
-     * @covers \phpDocumentor\GraphViz\Edge::getTo
      */
     public function testGetTo(): void
     {
@@ -101,10 +97,6 @@ class EdgeTest extends TestCase
      * Tests the magic __call method, to work as described, return the object
      * instance for a setX method, return the value for an getX method, and null
      * for the remaining method calls
-     *
-     * @covers \phpDocumentor\GraphViz\Edge::__call
-     * @covers \phpDocumentor\GraphViz\Edge::setAttribute
-     * @covers \phpDocumentor\GraphViz\Edge::getAttribute
      */
     public function testCall(): void
     {
@@ -112,12 +104,11 @@ class EdgeTest extends TestCase
         $fixture = new Edge(new Node('from'), new Node('to'));
         $this->assertInstanceOf(Edge::class, $fixture->setLabel($label));
         $this->assertSame($label, $fixture->getLabel()->getValue());
-        $this->assertNull($fixture->someNonExcistingMethod());
+        $this->expectException(\Exception::class);
+        $fixture->someNonExcistingMethod();
     }
 
     /**
-     * @covers \phpDocumentor\GraphViz\Edge::getAttribute
-     * @covers \phpDocumentor\GraphViz\Exceptions\AttributeNotFound::__construct
      */
     public function testGetNonExistingAttributeThrowsAttributeNotFound(): void
     {
@@ -132,8 +123,6 @@ class EdgeTest extends TestCase
     /**
      * Tests whether the magic __toString method returns a well formatted string
      * as specified in the DOT standard
-     *
-     * @covers \phpDocumentor\GraphViz\Edge::__toString
      */
     public function testToString(): void
     {
@@ -141,12 +130,7 @@ class EdgeTest extends TestCase
         $fixture->setLabel('MyLabel');
         $fixture->setWeight(45);
 
-        $dot = <<<DOT
-"from" -> "to" [
-label="MyLabel"
-weight="45"
-]
-DOT;
+        $dot = '"from" -> "to" [label="MyLabel", weight="45"]';
 
         $this->assertSame($dot, (string) $fixture);
     }

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace phpDocumentor\GraphViz\Traits;
 
+use Exception;
 use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
 
-trait AttributeSetterAndGetter
+trait AttributesSettersAndGetters
 {
     use Attributes;
 
@@ -15,10 +16,11 @@ trait AttributeSetterAndGetter
      *
      * Supports methods like setX(), getX().
      *
-     * @param string $name      Method name.
-     * @param array  $arguments Arguments for the method.
+     * @param string $name Method name.
+     * @param array $arguments Arguments for the method.
      *
      * @throws AttributeNotFound
+     * @throws \Exception
      */
     public function __call(string $name, array $arguments)
     {
@@ -34,6 +36,6 @@ trait AttributeSetterAndGetter
             return $this->getAttribute($key);
         }
 
-        throw new AttributeNotFound("Method {$name} not found.");
+        throw new Exception("Method '{$name}' not found");
     }
 }

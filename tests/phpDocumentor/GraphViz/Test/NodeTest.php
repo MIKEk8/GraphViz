@@ -15,15 +15,17 @@ namespace phpDocumentor\GraphViz\Test;
 
 use phpDocumentor\GraphViz\Exceptions\AttributeNotFound;
 use phpDocumentor\GraphViz\Node;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Test for the the class representing a GraphViz node.
+ * Test for the class representing a GraphViz node.
  */
+#[CoversClass(Node::class)]
 class NodeTest extends TestCase
 {
     /** @var Node */
-    protected $fixture = null;
+    protected Node $fixture;
 
     /**
      * Initializes the fixture for this test.
@@ -36,7 +38,6 @@ class NodeTest extends TestCase
     /**
      * Tests the construct method
      *
-     * @covers \phpDocumentor\GraphViz\Node::__construct
      * @returnn void
      */
     public function testConstruct(): void
@@ -53,7 +54,6 @@ class NodeTest extends TestCase
     /**
      * Tests the create method
      *
-     * @covers \phpDocumentor\GraphViz\Node::create
      * @returnn void
      */
     public function testCreate(): void
@@ -67,8 +67,6 @@ class NodeTest extends TestCase
     /**
      * Tests the getting and setting of the name.
      *
-     * @covers \phpDocumentor\GraphViz\Node::getName
-     * @covers \phpDocumentor\GraphViz\Node::setName
      */
     public function testName(): void
     {
@@ -94,21 +92,17 @@ class NodeTest extends TestCase
      * instance for a setX method, return the value for an getX method, and null
      * for the remaining method calls
      *
-     * @covers \phpDocumentor\GraphViz\Node::__call
-     * @covers \phpDocumentor\GraphViz\Node::getAttribute
-     * @covers \phpDocumentor\GraphViz\Node::setAttribute
      */
     public function testCall(): void
     {
         $fontname = 'Bitstream Vera Sans';
         $this->assertInstanceOf(Node::class, $this->fixture->setfontname($fontname));
         $this->assertSame($fontname, $this->fixture->getfontname()->getValue());
-        $this->assertNull($this->fixture->someNonExistingMethod());
+        $this->expectException(\Exception::class);
+        $this->fixture->someNonExcistingMethod();
     }
 
     /**
-     * @covers \phpDocumentor\GraphViz\Node::getAttribute
-     * @covers \phpDocumentor\GraphViz\Exceptions\AttributeNotFound::__construct
      */
     public function testGetNonExistingAttributeThrowsAttributeNotFound(): void
     {
@@ -122,20 +116,13 @@ class NodeTest extends TestCase
      * Tests whether the magic __toString method returns a well formatted string
      * as specified in the DOT standard
      *
-     * @covers \phpDocumentor\GraphViz\Node::__toString
      */
     public function testToString(): void
     {
         $this->fixture->setfontsize(12);
         $this->fixture->setfontname('Bitstream Vera Sans');
 
-        $dot = <<<DOT
-"name" [
-label="label"
-fontsize="12"
-fontname="Bitstream Vera Sans"
-]
-DOT;
+        $dot = '"name" [label="label", fontsize="12", fontname="Bitstream Vera Sans"]';
 
         $this->assertSame($dot, (string) $this->fixture);
     }
@@ -144,7 +131,6 @@ DOT;
      * Tests whether the magic __toString method returns a well formatted string
      * as specified in the DOT standard when the label contains slashes.
      *
-     * @covers \phpDocumentor\GraphViz\Node::__toString
      */
     public function testToStringWithLabelContainingSlashes(): void
     {
@@ -152,13 +138,7 @@ DOT;
         $this->fixture->setfontname('Bitstream Vera Sans');
         $this->fixture->setLabel('\phpDocumentor\Descriptor\ProjectDescriptor');
 
-        $dot = <<<DOT
-"name" [
-label="\\\\phpDocumentor\\\\Descriptor\\\\ProjectDescriptor"
-fontsize="12"
-fontname="Bitstream Vera Sans"
-]
-DOT;
+        $dot = '"name" [label="\\\\phpDocumentor\\\\Descriptor\\\\ProjectDescriptor", fontsize="12", fontname="Bitstream Vera Sans"]';
 
         $this->assertSame($dot, (string) $this->fixture);
     }

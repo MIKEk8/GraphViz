@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace phpDocumentor\GraphViz;
 
-use phpDocumentor\GraphViz\Traits\AttributeSetterAndGetter;
+use phpDocumentor\GraphViz\Traits\AttributesSettersAndGetters;
 
 /**
  * Represents a node/element in a GraphViz graph.
  */
 class Node
 {
-    use AttributeSetterAndGetter;
+    use AttributesSettersAndGetters;
 
     protected string $name;
 
@@ -75,7 +75,7 @@ class Node
      */
     public function __toString(): string
     {
-        $attributes = implode(PHP_EOL, array_map('strval', $this->attributes));
+        $attributes = implode(', ', array_map('strval', $this->attributes));
         $name = addslashes($this->name);
 
         return "\"{$name}\" [{$attributes}]";
