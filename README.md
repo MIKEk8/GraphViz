@@ -1,6 +1,6 @@
 # 🚨 Use at your own risk! 🚨
 
-## ⚠️ Notice: This is a fork of the [phpdocumentor/graphviz](https://github.com/phpDocumentor/GraphViz) library, modified for compatibility with PHP 8.4.**
+## ⚠️ Notice: This is a fork of the [phpdocumentor/graphviz](https://github.com/phpDocumentor/GraphViz) library, modified for compatibility with PHP 8.4.
 - Exceptions have been modified: Now the library throws an error when attempting to access non-existent attributes.
 
 ### ⚠️ Support and Updates:
