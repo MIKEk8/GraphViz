@@ -1,4 +1,4 @@
-## ⚠️ NOTICE: This is a fork of [phpdocumentor/graphviz](https://github.com/phpDocumentor/GraphViz) library, modified for PHP 8.4 compatibility.
+## ⚠️ NOTICE: This is a fork of [phpdocumentor/graphviz](https://github.com/phpDocumentor/GraphViz) library, modified for PHP 8.4 compatibility. And changes have been made to exceptions and references to non-existent attributes.
 # 🚨 This fork is no longer maintained or supported. Use at your own risk! 🚨
 
 GraphViz
